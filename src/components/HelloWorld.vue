@@ -1,60 +1,74 @@
+
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa" target="_blank" rel="noopener">pwa</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-router" target="_blank" rel="noopener">router</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-vuex" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-e2e-cypress" target="_blank" rel="noopener">e2e-cypress</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div>
+    <!-- <b-table striped hover :items="items" :fields="fields"></b-table> -->
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF/CNPJ</th>
+          <th>Data Nascimento</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="(item, key) in clientes">
+          <tr>
+            <td>{{item.nome}}</td>
+            <td>{{item.cpf_cnpj}}</td>
+            <td>{{item.data_nascimento}}</td>
+            <td>{{item.email}}</td>
+            <td>{{item.telefone}}</td>
+            <td>
+              <a href="#" class="btn btn-warning" @click="editClient(item)">Editar</a>
+              <a href="#" class="btn btn-danger" @click="deleteClient(item.id,key)">Deletar</a>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+
   </div>
 </template>
 
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+
+import axios from "axios";
+
+  export default {
+    data() {
+      return{
+        clientes: [],
+      }
+  },
+
+  mounted() {
+    this.getClients();
+  },
+
+  methods: {
+    getClients(){
+      var that = this;
+      axios.get("http://localhost:8000/clientes").then(function(response){
+        that.clientes = response.data.clientes
+        console.log(that.clientes);
+
+      });
+      
+    },
+
+    deleteClient(id, k){
+      var that = this;
+      axios.delete("http://localhost:8000/clientes/"+id).then(function(response){
+        // that.clientes = response.data.clientes
+        console.log(that.clientes);
+        that.clientes.splice(k,1)
+      });
+      
+    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
