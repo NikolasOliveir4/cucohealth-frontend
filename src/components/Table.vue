@@ -1,13 +1,32 @@
 
 <template>
   <div>
+   <div>
+      <div style="width: 20%" class="m-3">
+        <!-- <label for="search_name" style="display: flex;">Filtrar por Nome ou CPF/CNPJ</label> -->
+        <input class="w-100 mb-2" type="text" name="search_name" id="search_name" v-model="search_name" @keyup="searchInput" placeholder="Filtrar por Nome ou CPF/CNPJ">
+        <a href="#" class="btn btn-success d-flex justify-content-start" @click="isEdit = false, showModal = true, clientSelected = null">+Novo Cliente</a>
+      </div>
+
+   </div>
+
     <b-table striped hover :items="clientes" :fields="fields">
+      <template #cell(data_nascimento)="row">
+        <div>{{ convertDate(row.item.data_nascimento) }}</div>
+      </template>
+      <template #cell(cpf_cnpj)="row" >
+        <input v-if="row.item.tipo === 0" class="w-100 text-center border-0 bg-transparent outline-none" v-mask="'###.###.###-##'" v-bind:value="row.item.cpf_cnpj" readonly/>
+        <input v-else class="w-100 text-center border-0 bg-transparent outline-none" v-mask="'##.###.###/####-##'" v-bind:value="row.item.cpf_cnpj" readonly/>
+      </template>
+     
+      <template #cell(telefone)="row">
+        <input class="w-100 text-center border-0 bg-transparent outline-none" v-mask="'+## (##) #####-####'" v-bind:value="row.item.telefone" readonly/>
+      </template>
       <template #cell(actions)="row">
-        <a href="#" class="btn btn-warning" @click="editClient(row.item)"><b-icon icon="tools"></b-icon>Editar</a>
-        <a href="#" class="btn btn-danger" @click="deleteClient(item.id,key)"><b-icon icon="trash-fill" aria-hidden="true"></b-icon>Deletar</a>
+        <a href="#" class="btn btn-warning me-2" @click="editClient(row.item)"><b-icon icon="tools"></b-icon> Editar</a>
+        <a href="#" class="btn btn-danger" @click="deleteClient(row.item.id,row.index)"><b-icon icon="trash-fill" aria-hidden="true"></b-icon> Deletar</a>
       </template>
     </b-table>
-    <input type="text" name="search_name" id="search_name" v-model="search_name" @keyup="searchInput">
     <!-- <table>
       <thead>
         <tr>
@@ -36,20 +55,28 @@
       </tbody>
     </table> -->
     <CardClient 
-    v-bind:showModal="showModal"
-    v-bind:data="clientSelected"
+      v-if="showModal"
+      v-bind:showModal="showModal"
+      v-bind:customer="clientSelected"
+      v-bind:isEdit="isEdit"
+      v-on:closeModal="showModal = false"
+      v-on:updateClient="updateClient($event)"
+      v-on:createClient="createClient($event)"
     />
   </div>
 </template>
 
 <script>
-
+import {mask} from 'vue-the-mask'
 import axios from "axios";
 import CardClient from "./CardClient"
   export default{
     name: 'Table',
     components:{
-      CardClient
+      CardClient,
+    },
+    directives:{
+      mask
     },
     data() {
       return {
@@ -58,6 +85,7 @@ import CardClient from "./CardClient"
         timeout: null,
         showModal: false,
         clientSelected: null,
+        isEdit: null,
          fields: [
           {
             key: 'nome',
@@ -106,7 +134,11 @@ import CardClient from "./CardClient"
    async getClients(){
     try {
      const res = await axios.get("http://localhost:8000/clientes");
-     this.clientes = res.data.clientes;
+      console.log(res.data.clientes);
+      res.data.clientes.map((value)=>{
+
+      })
+      this.clientes = res.data.clientes;
     } catch (error) {
       //Silent error
     }
@@ -114,8 +146,11 @@ import CardClient from "./CardClient"
     },
 
     async deleteClient(id, k){
+      console.log(k)
+      const result = await this.$swal("Excluir cliente", "Você tem certeza?", "warning");
+      if (!result.isConfirmed) return;
       try { 
-        const res = await axios.delete(`http://localhost:8000/clientes/${id}`);
+        const res = await axios.put(`http://localhost:8000/clientes/delete/${id}`);
         if(res.status == 200){
           this.clientes.splice(k,1);
         }
@@ -123,14 +158,42 @@ import CardClient from "./CardClient"
         //Silent error
       }
     },
-
-    editClient(e){
+    async createClient(client) {
+        console.log(client,'CLIENTE');
+      // if (!result.isConfirmed) return;
+      try { 
+        const res = await axios.post('http://localhost:8000/clientes',client);
+        if(res.status == 200){
+          this.clientes = res.data.clientes;
+          const result = await this.$swal("Cliente inserido", "", "success");
+          console.log(res.data.clientes);
+        }
+      } catch (error) {
+        //Silent error
+      }
+    },
+    async updateClient(client) {
+      console.log(client);
+      console.log('CHEGUEI NO UPDATE')
+      // if (!result.isConfirmed) return;
+      try { 
+        const res = await axios.put(`http://localhost:8000/clientes/${client.id}`,client);
+        if(res.status == 200){
+          this.clientes = res.data.clientes;
+          const result = await this.$swal("Cliente atualizado", "", "success");
+          console.log(this.clientes);
+        }
+      } catch (error) {
+        //Silent error
+      }
+    },
+    editClient(e) {
       console.log(e)
       this.showModal = true;
+      this.isEdit = true;
       this.clientSelected = e;
     },
-
-    searchInput({target}){
+    searchInput({target}) {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(async ()=>{
         try {
@@ -141,6 +204,11 @@ import CardClient from "./CardClient"
         	//Silent error
         }
       }, 300);
+    },
+
+    convertDate(date) {
+      const newDate = new Date(date);
+      return Intl.DateTimeFormat('pt-BR', { timeZone: 'UCT' }).format(newDate);
     },
   }
 }
