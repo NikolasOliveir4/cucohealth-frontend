@@ -231,12 +231,9 @@ export default {
             }else{
                 erro += '<br>Preencha o Email';
             }
-            const today = new Date
-            console.log(today, this.cliente.data_nascimento);
-            if(this.cliente.data_nascimento >= today){
-                erro+= 'Tu nasceu hoje ou ainda não nasceu brother?'
+            if(!this.cliente.data_nascimento) {
+                erro+= '<br>Preencha a Data de nascimento'
             }
-
             if(erro_nome[0] == 'ok'){
                 this.$swal({
                 title: 'Atenção!',
