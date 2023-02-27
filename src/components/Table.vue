@@ -150,8 +150,9 @@ import CardClient from "./CardClient"
       const result = await this.$swal("Excluir cliente", "Você tem certeza?", "warning");
       if (!result.isConfirmed) return;
       try { 
-        const res = await axios.put(`http://localhost:8000/clientes/delete/${id}`);
+        const res = await axios.delete(`http://localhost:8000/clientes/delete/${id}`);
         if(res.status == 200){
+          const deleted = await this.$swal("Cliente excluído", "", "success");
           this.clientes.splice(k,1);
         }
       } catch (error) {
