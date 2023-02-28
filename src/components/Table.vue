@@ -3,7 +3,6 @@
   <div>
    <div>
       <div style="width: 20%" class="m-3">
-        <!-- <label for="search_name" style="display: flex;">Filtrar por Nome ou CPF/CNPJ</label> -->
         <input class="w-100 mb-2" type="text" name="search_name" id="search_name" v-model="search_name" @keyup="searchInput" placeholder="Filtrar por Nome ou CPF/CNPJ">
         <a href="#" class="btn btn-success d-flex justify-content-start" @click="isEdit = false, showModal = true, clientSelected = null">+Novo Cliente</a>
       </div>
@@ -27,33 +26,6 @@
         <a href="#" class="btn btn-danger" @click="deleteClient(row.item.id,row.index)"><b-icon icon="trash-fill" aria-hidden="true"></b-icon> Deletar</a>
       </template>
     </b-table>
-    <!-- <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>CPF/CNPJ</th>
-          <th>Data Nascimento</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="(item, key) in clientes">
-          <tr v-bind:key="item.id">
-            <td>{{item}}</td>
-            <td>{{item.cpf_cnpj}}</td>
-            <td>{{item.data_nascimento}}</td>
-            <td>{{item.email}}</td>
-            <td>{{item.telefone}}</td>
-            <td>
-              <a href="#" class="btn btn-warning" @click="editClient(item)">Editar</a>
-              <a href="#" class="btn btn-danger" @click="deleteClient(item.id,key)">Deletar</a>
-            </td>
-          </tr>
-        </template>
-      </tbody>
-    </table> -->
     <CardClient 
       v-if="showModal"
       v-bind:showModal="showModal"
@@ -117,12 +89,6 @@ import CardClient from "./CardClient"
             // Variant applies to the whole column, including the header and footer
           }
         ],
-        // items: [
-        //   { isActive: true, age: 40, nome: 'Dickerson', data_nascimento: 'Macdonald' },
-        //   { isActive: false, age: 21, nome: 'Larsen', data_nascimento: 'Shaw' },
-        //   { isActive: false, age: 89, nome: 'Geneva', data_nascimento: 'Wilson' },
-        //   { isActive: true, age: 38, nome: 'Jami', data_nascimento: 'Carney' }
-        // ]
       }
     },
 
@@ -161,7 +127,6 @@ import CardClient from "./CardClient"
     },
     async createClient(client) {
         console.log(client,'CLIENTE');
-      // if (!result.isConfirmed) return;
       try { 
         const res = await axios.post('http://localhost:8000/clientes',client);
         if(res.status == 200){
@@ -176,7 +141,6 @@ import CardClient from "./CardClient"
     async updateClient(client) {
       console.log(client);
       console.log('CHEGUEI NO UPDATE')
-      // if (!result.isConfirmed) return;
       try { 
         const res = await axios.put(`http://localhost:8000/clientes/${client.id}`,client);
         if(res.status == 200){

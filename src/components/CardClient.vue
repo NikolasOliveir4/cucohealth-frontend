@@ -99,16 +99,15 @@ export default {
         return formattedDate;
         },
         async searchInputCpfCnpj({target}){
-            // console.log(target.value);
             const query = target.value.replace(/\D/g, '');
             console.log(query.length)
             if(query.length > 10){
                 if(query.length > 11){
                     if(this.validCnpj(query)){
-                    //    console.log('SOU MAIOR Q 1')
+                  
                         try {
                             const res = await axios.get(`http://localhost:8000/clientes/cpfcnpj?q=${query}`);
-                            // console.log(res.data.message);
+                            
                             this.message = res.data.message;
                         } catch (err) {
                                 //Silent error
@@ -118,10 +117,10 @@ export default {
                     }
                 }else{
                     if(this.validCpf(query)){
-                        // console.log('SOU MAIOR Q 1')
+        
                         try {
                             const res = await axios.get(`http://localhost:8000/clientes/cpfcnpj?q=${query}`);
-                            // console.log(res.data.message);
+                            
                             this.message = res.data.message;
                         } catch (err) {
                                 //Silent error
@@ -139,13 +138,13 @@ export default {
         },
         sendData(type) {
             if(type == 'edit'){
-                // console.log('CHEGOU AQUI')
+                
                 this.$emit('updateClient',this.cliente);
             }else{
                 this.$emit('createClient',this.cliente);
             }
             this.$emit('closeModal');
-            // console.log('CHEGOU AQUI2')
+            
 
         },
         async validation(type) {
@@ -154,11 +153,9 @@ export default {
             if(this.cliente.nome){
                 var nome_sobrenome = this.cliente.nome.split(" ")               
                 if(nome_sobrenome[0] && nome_sobrenome[1]){
-                    // console.log('CHEGUEI AQUI!')
                     if((nome_sobrenome[1] == 'de' || nome_sobrenome[1] == 'da' || nome_sobrenome[1] == 'do') && nome_sobrenome[2]) {
                         if(nome_sobrenome[0].length >= 3 && nome_sobrenome[2].length >= 3) {
                         var nome_sem_espaco = this.cliente.nome.trim()
-                        // console.log(nome_sem_espaco,'teste eu');
                         if(!nome_sem_espaco.match(/^[a-zA-Zà-úÀ-Ú ]{2,}$/)) {
                             erro += '<br>Nome inválido, preencha corretamente'
                         }
@@ -171,16 +168,13 @@ export default {
                             }
                         }
                     } else {
-                        // console.log('EU TO AQUI AGORA')
                         if(nome_sobrenome[0].length >= 3 && nome_sobrenome[1].length >= 3) {
                             var nome_sem_espaco = this.cliente.nome.trim()
-                            // console.log(nome_sem_espaco,'CHEGUEI AQUI')
                             if(!nome_sem_espaco.match(/^[a-zA-Zà-úÀ-Ú ]{2,}$/)) {
                                 erro += '<br>Nome inválido, preencha corretamente'
                             }
                         } else {
                             var nome_sem_espaco = this.cliente.nome.trim()
-                            // console.log(nome_sem_espaco,'OU AQUI')
                             if(!nome_sem_espaco.match(/^[a-zA-Zà-úÀ-Ú ]{2,}$/)) {
                                 erro += '<br>Nome inválido, preencha corretamente'
                             }else{
@@ -215,13 +209,10 @@ export default {
             }else{
                 erro+= '<br>Preencha o CPF/CNPJ'
             }
-            // console.log(this.message,this.cliente.tipo,'MESSAGE!')
             if(this.message == ' Já cadastrado!' && this.cliente.tipo == 0){
-                // console.log(this.message,'MESSAGE!')
                 erro += '<br>CPF' + this.message;
             }
             if(this.message == ' Já cadastrado!' && this.cliente.tipo == 1){
-                // console.log(this.message,'MESSAGE!')
                 erro += '<br>CNPJ' + this.message;
             }
             if(this.cliente.email){
@@ -247,7 +238,6 @@ export default {
                 }).then((result) => {
                 if (result.isConfirmed) {
                     if(erro != "") {
-                        // alert(erro);
                         const result = this.$swal("Atenção!", erro, "warning");
     
                     } else {
@@ -257,7 +247,6 @@ export default {
                 })
             }else{
                 if(erro != "") {
-                        // alert(erro);
                         const result = this.$swal("Atenção!", erro, "warning");
     
                     } else {
